@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 function App() {
 
   const [result, setResult] = React.useState(null);
+  const [chart, setChart] = React.useState(null);
 
   const requestOptions = {
     method: 'GET',
@@ -26,6 +27,7 @@ function App() {
       console.log("error")
     }
 
+    markPoints(playerName);
   }
 
   function createButton() {
@@ -42,32 +44,102 @@ function App() {
 
     newButton.addEventListener("click", function() {
       // Call another method when the button is pressed
-      getPlayerData(buttonName);
+      getPlayerData(buttonName, 0);
     });
 
     buttonNameInput.value = "";
 }
 
+function markPoints(playerName, count) {
+  console.log("Mark Points Success");
+    try {
+      fetch(`https://nba-stats-db.herokuapp.com/api/shot_chart_data/${playerName}/2023/`, requestOptions)
+      .then(response => response.json())
+      .then(data =>{
+        setChart(data);
+        console.log(data['results']);
+      })
+    } catch {
+      console.log("error")
+    }
+
+
+  var image = document.getElementById('myImage');
+  var canvas = document.getElementById('pointCanvas');
+  var context = canvas.getContext('2d');
+
+  // Set the canvas size to match the image size
+  canvas.width = image.width;
+  canvas.height = image.height;
+
+  // Draw the image on the canvas
+  context.drawImage(image, 0, 0);
+
+  context.fillStyle = 'red';
+  context.strokeStyle = 'red';
+  context.lineWidth = 2;
+  if(chart != null) {
+    for (var i = 0; i < chart['results'].length; i++) {
+      context.fillStyle = 'red';
+      context.strokeStyle = 'red';
+      var top = chart['results'][i]['top'];
+      var left = chart['results'][i]['left'];
+      if(chart['results'][i]['result']) {
+        context.fillStyle = 'green';
+        context.strokeStyle = 'green';
+      }
+      context.beginPath();
+      context.arc(left, top, 5, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+    }
+  } else {
+    if(count < 3) {
+      sleep(3000).then(() => {
+        console.log("Get's here")
+        markPoints(playerName, count + 1);
+      })
+    }  
+  } 
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
   return(
     <div>
      <h1>Learn about your favorite NBA Player</h1>
+     <h2>Double click button for updated shot chart.</h2>
+     <h2>Note: Shot chart data is only available for the three existing players: Stephen Curry, James Harden, and Lebron James</h2>
      <div id="buttonContainer">
-            <button onClick={() => getPlayerData("Luka Dončić")}>Luka Dončić</button> 
-            <button onClick={() => getPlayerData("Dwight Powell")}>Dwight Powell</button> 
+            <button onClick={() => getPlayerData("Stephen Curry")}>Stephen Curry</button> 
+            <button onClick={() => getPlayerData("James Harden")}>James Harden</button> 
             <button onClick={() => getPlayerData("LeBron James")}>LeBron James</button> 
      </div>
 
-    <label for="buttonName">Enter Button Name:</label>
+    <label for="buttonName">Enter Player Name:</label>
     <input type="text" id="buttonName" placeholder="Type something..."></input>
     <button onClick={createButton}>Submit</button>
+    <div id='textImgContainer'>
+      <div id='textContainer'>
+        <h2>{result != null ? "Name: " + result['results'][0]['player_name'] : "No data found"}</h2>
+        <p>{result != null ? "Free Throw Percentage: " + (100 * (result['results'][0]['ft_percent'])).toFixed(2) + "%" : ""}</p>
+        <p>{result != null ? "3 point percentage: " + (100 * (result['results'][0]['three_percent'])).toFixed(2) + "%": ""}</p>
+        <p>{result != null ? "Field goal percentage: " + (100 * (result['results'][0]['field_percent'])).toFixed(2) + "%": ""}</p>
+        <p>{result != null ? "Total points: " + result['results'][0]['PTS']: ""}</p>
+        <p>{result != null ? "Total assists: " + result['results'][0]['AST']: ""}</p>
+        <p>{result != null ? "Total rebounds: " + result['results'][0]['TRB']: ""}</p>
+      </div>
+      <div id="imageContainer">
+        <img id="myImage" src={require('./nbahalfcourt.png')} alt="NBA Half Court Image"></img>
+        <canvas id="pointCanvas"></canvas>
+      </div>
+    </div>
+    
 
-    <h2>{result != null ? "Name: " + result['results'][0]['player_name'] : "No data found"}</h2>
-    <p>{result != null ? "Free Throw Percentage: " + (100 * (result['results'][0]['ft_percent'])).toFixed(2) + "%" : ""}</p>
-    <p>{result != null ? "3 point percentage: " + (100 * (result['results'][0]['three_percent'])).toFixed(2) + "%": ""}</p>
-    <p>{result != null ? "Field goal percentage: " + (100 * (result['results'][0]['field_percent'])).toFixed(2) + "%": ""}</p>
-    <p>{result != null ? "Total points: " + result['results'][0]['PTS']: ""}</p>
-    <p>{result != null ? "Total assists: " + result['results'][0]['AST']: ""}</p>
-    <p>{result != null ? "Total rebounds: " + result['results'][0]['TRB']: ""}</p>
+    
 
     </div>
   )
