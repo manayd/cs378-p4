@@ -110,7 +110,7 @@ function sleep(ms) {
 
   return(
     <div>
-     <h1>Learn about your favorite NBA Player</h1>
+     <h1>Learn about your favorite NBA Player's 2023 Season</h1>
      <h2>Double click button for updated shot chart.</h2>
      <h2>Note: Shot chart data is only available for the three existing players: Stephen Curry, James Harden, and Lebron James</h2>
      <div id="buttonContainer">
@@ -125,12 +125,16 @@ function sleep(ms) {
     <div id='textImgContainer'>
       <div id='textContainer'>
         <h2>{result != null ? "Name: " + result['results'][0]['player_name'] : "No data found"}</h2>
-        <p>{result != null ? "Free Throw Percentage: " + (100 * (result['results'][0]['ft_percent'])).toFixed(2) + "%" : ""}</p>
-        <p>{result != null ? "3 point percentage: " + (100 * (result['results'][0]['three_percent'])).toFixed(2) + "%": ""}</p>
-        <p>{result != null ? "Field goal percentage: " + (100 * (result['results'][0]['field_percent'])).toFixed(2) + "%": ""}</p>
-        <p>{result != null ? "Total points: " + result['results'][0]['PTS']: ""}</p>
-        <p>{result != null ? "Total assists: " + result['results'][0]['AST']: ""}</p>
-        <p>{result != null ? "Total rebounds: " + result['results'][0]['TRB']: ""}</p>
+        <h4>{result != null ? "Free Throw Percentage: " + (100 * (result['results'][0]['ft_percent'])).toFixed(2) + "%" : "No data found"}</h4>
+        <h4>{result != null ? "3 point percentage: " + (100 * (result['results'][0]['three_percent'])).toFixed(2) + "%": "No data found"}</h4>
+        <h4>{result != null ? "3 point attempts: " + result['results'][0]['three_attempts']: "No data found"}</h4>
+        <h4>{result != null ? "Field goal percentage: " + (100 * (result['results'][0]['field_percent'])).toFixed(2) + "%": "No data found"}</h4>
+        <h4>{result != null ? "Total points: " + result['results'][0]['PTS']: "No data found"}</h4>
+        <h4>{result != null ? "Total assists: " + result['results'][0]['AST']: "No data found"}</h4>
+        <h4>{result != null ? "Total rebounds: " + result['results'][0]['TRB']: "No data found"}</h4>
+        <h4>{result != null ? "Total steals: " + result['results'][0]['STL']: "No data found"}</h4>
+        <h4>{result != null ? "Games played: " + result['results'][0]['games']: "No data found"}</h4>
+        <h4>{result != null ? "Total minutes played: " + result['results'][0]['minutes_played']: ""}</h4>
       </div>
       <div id="imageContainer">
         <img id="myImage" src={require('./nbahalfcourt.png')} alt="NBA Half Court Image"></img>
